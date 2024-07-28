@@ -1,0 +1,93 @@
+#!/bin/bash
+# shellcheck disable=SC1091,SC2164,SC2034,SC1072,SC1073,SC1009
+
+if [[ "$EUID" -ne 0 ]]; then
+    echo "Run this as root"
+    exit
+fi
+
+function install_packages() {
+    apt update
+    apt install -y apache2 mariadb-server mariadb-client php php-common php-mysql php-xml php-xmlrpc php-curl php-gd php-imagick php-cli php-dev php-imap php-mbstring php-soap php-zip php-intl wget unzip
+}
+
+function enable_services() {
+    systemctl enable apache2
+    systemctl start apache2
+    systemctl enable --now mariadb
+    mysql_secure_installation
+}
+
+function download_wordpress() {
+    if [ -f latest.zip ]; then
+        echo "WordPress zip file already exists."
+    else
+        wget https://wordpress.org/latest.zip
+    fi
+    unzip -o latest.zip
+    cd wordpress
+    cp -r * /var/www/html
+    cd /var/www/html
+    rm -rf index.html
+}
+
+function configure_wordpress() {
+    systemctl restart apache2
+    chown -R www-data:www-data /var/www/
+}
+
+function setup_database() {
+    read -p "Enter the name of the new database: " NEW_DB
+    read -p "Enter the name of the new user: " NEW_USER
+    read -sp "Enter the password for the new user: " NEW_USER_PASSWORD
+    echo
+
+    mysql -u root -p <<EOF
+CREATE DATABASE $NEW_DB;
+CREATE USER '$NEW_USER'@'%' IDENTIFIED BY '$NEW_USER_PASSWORD';
+GRANT ALL PRIVILEGES ON $NEW_DB.* TO '$NEW_USER'@'%';
+FLUSH PRIVILEGES;
+EOF
+    systemctl restart apache2
+}
+
+function check_package() {
+    dpkg -l | grep -qw "$1"
+}
+
+function menu() {
+    while true; do
+        echo "Select an option:"
+        echo "1) Install required packages"
+        echo "2) Enable and configure services"
+        echo "3) Download and configure WordPress"
+        echo "4) Setup WordPress database"
+        echo "5) Exit"
+        read -rp "Enter your choice: " choice
+
+        case $choice in
+            1)
+                echo "Checking for required packages..."
+                install_packages
+                ;;
+            2)
+                enable_services
+                ;;
+            3)
+                download_wordpress
+                configure_wordpress
+                ;;
+            4)
+                setup_database
+                ;;
+            5)
+                exit 0
+                ;;
+            *)
+                echo "Invalid choice. Please try again."
+                ;;
+        esac
+    done
+}
+
+menu

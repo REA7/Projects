@@ -1,22 +1,21 @@
-sudo apt update
-sudo apt install -y expect
-sudo apt install -y apache2
-sudo systemctl enable apache2
-sudo systemctl start apache2
-sudo apt install -y mariadb-server mariadb-client
-sudo systemctl enable --now mariadb
+apt update
+apt install -y apache2
+systemctl enable apache2
+systemctl start apache2
+apt install -y mariadb-server mariadb-client
+systemctl enable --now mariadb
 mysql_secure_installation
-sudo apt install -y php php-common php-mysql php-xml php-xmlrpc php-curl php-gd php-imagick php-cli php-dev php-imap php-mbstring php-soap php-zip php-intl
-sudo apt install -y wget unzip
+apt install -y php php-common php-mysql php-xml php-xmlrpc php-curl php-gd php-imagick php-cli php-dev php-imap php-mbstring php-soap php-zip php-intl
+apt install -y wget unzip
 wget https://wordpress.org/latest.zip
-sudo unzip latest.zip
+unzip latest.zip
 cd wordpress
-sudo cp -r * /var/www/html
+cp -r * /var/www/html
 cd /var/www/html
-sudo rm -rf index.html
-sudo apt install -y php-mysql php-cgi php-cli php-gd -y
-sudo systemctl restart apache2
-sudo chown -R www-data:www-data /var/www/
+rm -rf index.html
+apt install -y php-mysql php-cgi php-cli php-gd -y
+systemctl restart apache2
+chown -R www-data:www-data /var/www/
 read -p "Enter the name of the new database: " NEW_DB
 read -p "Enter the name of the new user: " NEW_USER
 read -sp "Enter the password for the new user: " NEW_USER_PASSWORD
@@ -27,4 +26,4 @@ CREATE USER '$NEW_USER'@'%' IDENTIFIED BY '$NEW_USER_PASSWORD';
 GRANT ALL PRIVILEGES ON $NEW_DB.* TO '$NEW_USER'@'%';
 FLUSH PRIVILEGES;
 EOF
-sudo systemctl restart apache2
+systemctl restart apache2

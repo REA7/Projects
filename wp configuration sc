@@ -5,14 +5,11 @@ if [[ "$EUID" -ne 0 ]]; then
     exit
 fi
 apt update
-apt install -y apache2
+apt install -y apache2 mariadb-server mariadb-client wget unzip php php-common php-mysql php-xml php-xmlrpc php-curl php-gd php-imagick php-cli php-dev php-imap php-mbstring php-soap php-zip php-intl
 systemctl enable apache2
 systemctl start apache2
-apt install -y mariadb-server mariadb-client
 systemctl enable --now mariadb
 mysql_secure_installation
-apt install -y php php-common php-mysql php-xml php-xmlrpc php-curl php-gd php-imagick php-cli php-dev php-imap php-mbstring php-soap php-zip php-intl
-apt install -y wget unzip
 wget https://wordpress.org/latest.zip
 unzip latest.zip
 cd wordpress
@@ -20,7 +17,6 @@ cp -r * /var/www/html
 cd /var/www/html
 rm -rf index.html
 apt install -y php-mysql php-cgi php-cli php-gd -y
-systemctl restart apache2
 chown -R www-data:www-data /var/www/
 read -p "Enter the name of the new database: " NEW_DB
 read -p "Enter the name of the new user: " NEW_USER

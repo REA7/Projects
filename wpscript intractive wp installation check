@@ -5,11 +5,11 @@ if [[ "$EUID" -ne 0 ]]; then
     exit
 fi
 
-sudo apt update
-sudo apt install -y apache2 mariadb-server mariadb-client php php-common php-mysql php-xml php-xmlrpc php-curl php-gd php-imagick php-cli php-dev php-imap php-mbstring php-soap php-zip php-intl wget unzip
+apt update
+apt install -y apache2 mariadb-server mariadb-client php php-common php-mysql php-xml php-xmlrpc php-curl php-gd php-imagick php-cli php-dev php-imap php-mbstring php-soap php-zip php-intl wget unzip
 
-sudo systemctl enable --now apache2
-sudo systemctl enable --now mariadb
+systemctl enable --now apache2
+systemctl enable --now mariadb
 mysql_secure_installation
 
 check_wordpress_files() {
@@ -22,12 +22,12 @@ check_wordpress_files() {
 
 install_wordpress() {
     wget https://wordpress.org/latest.zip
-    sudo unzip latest.zip
+    unzip latest.zip
     cd wordpress
-    sudo cp -r * /var/www/html
+    cp -r * /var/www/html
     cd /var/www/html
-    sudo rm -rf index.html
-    sudo chown -R www-data:www-data /var/www/
+    rm -rf index.html
+    chown -R www-data:www-data /var/www/
 }
 
 echo "Choose an option for WordPress installation:"
@@ -73,7 +73,6 @@ case $WP_CHOICE in
         ;;
 esac
 
-# Database setup
 read -p "Enter the name of the new database: " NEW_DB
 read -p "Enter the name of the new user: " NEW_USER
 read -sp "Enter the password for the new user: " NEW_USER_PASSWORD
@@ -84,4 +83,4 @@ CREATE USER '$NEW_USER'@'%' IDENTIFIED BY '$NEW_USER_PASSWORD';
 GRANT ALL PRIVILEGES ON $NEW_DB.* TO '$NEW_USER'@'%';
 FLUSH PRIVILEGES;
 EOF
-sudo systemctl restart apache2
+systemctl restart apache2

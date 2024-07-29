@@ -30,6 +30,8 @@ install_wordpress() {
     chown -R www-data:www-data /var/www/
 }
 
+systemctl restart apache2
+
 echo "Choose an option for WordPress installation:"
 echo "1) I already have WordPress"
 echo "2) I want to install WordPress"
@@ -83,4 +85,3 @@ CREATE USER '$NEW_USER'@'%' IDENTIFIED BY '$NEW_USER_PASSWORD';
 GRANT ALL PRIVILEGES ON $NEW_DB.* TO '$NEW_USER'@'%';
 FLUSH PRIVILEGES;
 EOF
-systemctl restart apache2
